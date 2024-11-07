@@ -32,6 +32,7 @@ public abstract class User {
     private String password;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
 }
