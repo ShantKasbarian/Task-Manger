@@ -23,6 +23,7 @@ public class Team {
     @Column(name = "name", unique = true)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private TeamStatus teamStatus;
 

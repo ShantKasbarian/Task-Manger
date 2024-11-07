@@ -2,7 +2,9 @@ package com.task_manager.converters;
 
 import com.task_manager.entities.Team;
 import com.task_manager.models.TeamDto;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TeamConverter implements Converter<Team, TeamDto>{
     @Override
     public Team convertToEntity(Team entity, TeamDto model) {

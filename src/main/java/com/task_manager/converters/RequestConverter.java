@@ -2,7 +2,9 @@ package com.task_manager.converters;
 
 import com.task_manager.entities.Request;
 import com.task_manager.models.RequestDto;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RequestConverter implements Converter<Request, RequestDto> {
 
     @Override

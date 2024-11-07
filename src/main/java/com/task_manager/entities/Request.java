@@ -32,4 +32,8 @@ public class Request {
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "request_status")
+    private RequestStatus requestStatus;
 }
