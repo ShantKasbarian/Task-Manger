@@ -10,14 +10,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RequestDto {
-
-    private Long requestId;
-
-    private String title;
-
-    private String description;
-
+public class RequestStatusDto {
     private RequestStatus requestStatus;
-
 }
