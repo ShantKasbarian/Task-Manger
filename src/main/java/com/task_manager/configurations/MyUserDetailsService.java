@@ -22,6 +22,6 @@ public class MyUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("bad credentials");
         }
 
-        return new UserPrincipal(user);
+        return user;
     }
 }

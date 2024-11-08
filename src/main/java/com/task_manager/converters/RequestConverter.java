@@ -12,6 +12,7 @@ public class RequestConverter implements Converter<Request, RequestDto> {
         entity.setRequestId(model.getRequestId());
         entity.setDescription(model.getDescription());
         entity.setTitle(model.getTitle());
+        entity.setRequestStatus(model.getRequestStatus());
         return entity;
     }
 
@@ -20,6 +21,7 @@ public class RequestConverter implements Converter<Request, RequestDto> {
         model.setRequestId(entity.getRequestId());
         model.setDescription(entity.getDescription());
         model.setTitle(entity.getTitle());
+        model.setRequestStatus(entity.getRequestStatus());
         return model;
     }
 }
