@@ -18,7 +18,7 @@ public class TeamConverter implements Converter<Team, TeamDto>{
     public TeamDto convertToModel(Team entity, TeamDto model) {
         model.setTeamId(entity.getTeamId());
         model.setName(entity.getName());
-        model.setTeamStatus(model.getTeamStatus());
+        model.setTeamStatus(entity.getTeamStatus());
         return model;
     }
 }

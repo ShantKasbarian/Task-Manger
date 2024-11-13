@@ -2,6 +2,7 @@ package com.task_manager.controllers;
 
 import com.task_manager.converters.RequestConverter;
 import com.task_manager.entities.*;
+import com.task_manager.models.PageDto;
 import com.task_manager.models.RequestDto;
 import com.task_manager.models.RequestStatusDto;
 import com.task_manager.services.RequestService;
@@ -52,7 +53,7 @@ public class RequestController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/{reqId}")
-    public ResponseEntity<?> getRequestById(
+    public ResponseEntity<RequestDto> getRequestById(
             Authentication authentication,
             @PathVariable Long reqId
     ) {
@@ -68,7 +69,7 @@ public class RequestController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @PutMapping("/update")
-    public ResponseEntity<?> updateRequest(
+    public ResponseEntity<RequestDto> updateRequest(
             Authentication authentication,
             @RequestBody RequestDto requestDto
     ) {
@@ -87,7 +88,7 @@ public class RequestController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @GetMapping("/all")
-    public ResponseEntity<?> getAllCustomerRequests(
+    public ResponseEntity<PageDto<RequestDto>> getAllCustomerRequests(
             Authentication authentication,
             @RequestParam(value = "num", required = false, defaultValue = "0") Integer pageNum,
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
@@ -115,7 +116,7 @@ public class RequestController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/pending")
-    public ResponseEntity<?> getAllPendingRequests(
+    public ResponseEntity<PageDto<RequestDto>> getAllPendingRequests(
             @RequestParam(value = "num", required = false, defaultValue = "0") Integer pageNum,
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
     ) {
@@ -126,36 +127,41 @@ public class RequestController {
 
     @PreAuthorize("hasRole('TEAM_LEAD')")
     @PutMapping("/{reqId}/take")
-    public ResponseEntity<?> takeRequest(
+    public ResponseEntity<RequestDto> takeRequest(
             Authentication authentication,
             @PathVariable Long reqId
     ) {
         TeamLead teamLead = (TeamLead) authentication.getPrincipal();
 
-        return ResponseEntity.ok(requestService.takeRequest(reqId, teamLead.getTeam()));
+        return ResponseEntity.ok(
+                requestConverter.convertToModel(
+                        requestService.takeRequest(reqId, teamLead.getTeam()),
+                        new RequestDto()
+                )
+        );
     }
 
     @PreAuthorize("hasRole('TEAM_LEAD')")
     @PutMapping("/{reqId}/status")
-    public ResponseEntity<?> changeStatus(
+    public ResponseEntity<RequestDto> changeStatus(
             Authentication authentication,
             @RequestBody RequestStatusDto requestStatusDto,
             @PathVariable Long reqId
     ) {
         TeamLead teamLead = (TeamLead) authentication.getPrincipal();
 
-        return ResponseEntity.ok(
+        return ResponseEntity.ok(requestConverter.convertToModel(
             requestService.changeRequestStatus(
                 requestStatusDto.getRequestStatus(),
                 reqId,
                 teamLead.getTeam().getTeamId()
-            )
+            ), new RequestDto())
         );
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{reqId}/reject")
-    public ResponseEntity<?> rejectRequest(@PathVariable Long reqId) {
+    public ResponseEntity<RequestDto> rejectRequest(@PathVariable Long reqId) {
         return ResponseEntity.ok(requestConverter.convertToModel(
                 requestService.rejectRequest(reqId),
                 new RequestDto()
@@ -165,7 +171,7 @@ public class RequestController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{reqId}/accept")
-    public ResponseEntity<?> acceptRequest(@PathVariable Long reqId) {
+    public ResponseEntity<RequestDto> acceptRequest(@PathVariable Long reqId) {
         return new ResponseEntity<>(
                 requestConverter.convertToModel(
                         requestService.acceptRequest(reqId),
@@ -176,11 +182,26 @@ public class RequestController {
 
     @PreAuthorize("hasRole('TEAM_LEAD') or hasRole('ADMIN')")
     @GetMapping("/accepted")
-    public ResponseEntity<?> getAllAcceptedRequests(
+    public ResponseEntity<PageDto<RequestDto>> getAllAcceptedRequests(
             @RequestParam(value = "num", required = false, defaultValue = "0") Integer pageNum,
             @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
     ) {
         Pageable pageable = PageRequest.of(pageNum, size);
         return ResponseEntity.ok(requestService.getAllAcceptedRequest(pageable));
+    }
+
+    @PreAuthorize("hasRole('TEAM_LEAD')")
+    @GetMapping("/team")
+    public ResponseEntity<PageDto<RequestDto>> getRequestsByTeam(
+            Authentication authentication,
+            @RequestParam(value = "num", required = false, defaultValue = "0") Integer pageNum,
+            @RequestParam(value = "size", required = false, defaultValue = "10") Integer size
+    ) {
+        Pageable pageable = PageRequest.of(pageNum, size);
+        TeamLead teamLead = (TeamLead) authentication.getPrincipal();
+
+        return ResponseEntity.ok(
+                requestService.getRequestsByTeam(teamLead.getTeam(), pageable)
+        );
     }
 }
