@@ -11,6 +11,10 @@ public class TaskConverter implements Converter<Task, TaskDto> {
         entity.setTaskId(model.getId());
         entity.setTitle(model.getTitle());
         entity.setDescription(model.getDescription());
+        entity.setTaskStatus(model.getTaskStatus());
+        entity.setAssignedTime(model.getAssignedTime());
+        entity.setEndTime(model.getEndTime());
+        entity.setDeadline(model.getDeadline());
         return entity;
     }
 
@@ -19,6 +23,10 @@ public class TaskConverter implements Converter<Task, TaskDto> {
         model.setId(entity.getTaskId());
         model.setTitle(entity.getTitle());
         model.setDescription(entity.getDescription());
+        model.setTaskStatus(entity.getTaskStatus());
+        model.setAssignedTime(entity.getAssignedTime());
+        model.setEndTime(entity.getEndTime());
+        model.setDeadline(entity.getDeadline());
         return model;
     }
 }

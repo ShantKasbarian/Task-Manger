@@ -7,6 +7,7 @@ import com.task_manager.entities.RequestStatus;
 import com.task_manager.entities.Team;
 import com.task_manager.models.PageDto;
 import com.task_manager.models.RequestDto;
+import com.task_manager.models.TaskDto;
 import com.task_manager.repositories.RequestRepo;
 import com.task_manager.repositories.TeamRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -188,6 +189,23 @@ public class RequestService {
 
     public PageDto<RequestDto> getAllAcceptedRequest(Pageable pageable) {
         Page<Request> page = requestRepo.findByRequestStatus(RequestStatus.ACCEPTED, pageable);
+
+        List<RequestDto> requests = page.stream()
+                .map(request -> requestConverter.convertToModel(request, new RequestDto()))
+                .toList();
+
+        PageDto<RequestDto> pageDto = new PageDto<>();
+        pageDto.setContent(requests);
+        pageDto.setPageNo(pageable.getPageSize());
+        pageDto.setPageSize(page.getSize());
+        pageDto.setTotalPages(page.getTotalPages());
+        pageDto.setEmpty(page.isEmpty());
+
+        return pageDto;
+    }
+
+    public PageDto<RequestDto> getRequestsByTeam(Team team, Pageable pageable) {
+        Page<Request> page = requestRepo.findByTeam(team, pageable);
 
         List<RequestDto> requests = page.stream()
                 .map(request -> requestConverter.convertToModel(request, new RequestDto()))

@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,4 +29,17 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Employee employee;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private TaskStatus taskStatus;
+
+    @Column(name = "assigned_time")
+    private LocalDateTime assignedTime;
+
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
+
+    @Column(name = "deadline")
+    private LocalDateTime deadline;
 }
