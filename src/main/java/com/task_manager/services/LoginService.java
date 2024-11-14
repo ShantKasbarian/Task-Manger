@@ -29,7 +29,7 @@ public class LoginService {
         );
 
         if (authentication.isAuthenticated()) {
-            return this.jwtService.generateToken(username);
+            return jwtService.generateToken(username);
         }
 
         throw new RuntimeException("bad credentials");

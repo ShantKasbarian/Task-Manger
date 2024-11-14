@@ -20,7 +20,7 @@ public class RegisterService {
 
     public User register(User user) throws NoSuchAlgorithmException {
         if (userRepo.findByEmail(user.getEmail()) != null) {
-            throw new RuntimeException("email has already been used");
+            throw new RuntimeException("email is already in use");
         }
 
         if (userRepo.findByUsername(user.getUsername()) != null) {
@@ -32,7 +32,7 @@ public class RegisterService {
         }
 
         if (user.getUsername() == null) {
-            throw new RuntimeException("name must be specified");
+            throw new RuntimeException("username must be specified");
         }
         String pw_hash = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12));
         user.setPassword(pw_hash);
