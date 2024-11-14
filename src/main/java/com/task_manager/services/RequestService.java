@@ -7,7 +7,6 @@ import com.task_manager.entities.RequestStatus;
 import com.task_manager.entities.Team;
 import com.task_manager.models.PageDto;
 import com.task_manager.models.RequestDto;
-import com.task_manager.models.TaskDto;
 import com.task_manager.repositories.RequestRepo;
 import com.task_manager.repositories.TeamRepo;
 import org.springframework.beans.factory.annotation.Autowired;
