@@ -45,7 +45,7 @@ public class TaskService {
 
         if (
                 task.getDescription() == null ||
-                task.getDescription().length() < 20
+                task.getDescription().trim().length() < 20
         ) {
             throw new RuntimeException("task description must be greater than 20 characters");
         }
@@ -94,7 +94,7 @@ public class TaskService {
 
         if (
                 task.getDescription() == null ||
-                        task.getDescription().length() < 20
+                        task.getDescription().trim().length() < 20
         ) {
             throw new RuntimeException("task description must be greater than 20 characters");
         }
@@ -144,8 +144,8 @@ public class TaskService {
         Page<Task> page = taskRepo.getTasksByEmployee(employee, pageable);
 
         List<TaskDto> tasks = page.stream()
+                .filter(task -> task.getDeadline().isBefore(LocalDateTime.now()))
                 .map(task -> taskConverter.convertToModel(task, new TaskDto()))
-                .filter(taskDto -> taskDto.getDeadline().isBefore(LocalDateTime.now()))
                 .collect(Collectors.toList());
 
         PageDto<TaskDto> pageDto = new PageDto<>();
@@ -162,8 +162,8 @@ public class TaskService {
         Page<Task> page = taskRepo.getTasksByEmployee(employee, pageable);
 
         List<TaskDto> tasks = page.stream()
-                .map(task -> taskConverter.convertToModel(task, new TaskDto()))
                 .filter(taskDto -> taskDto.getDeadline().isAfter(LocalDateTime.now()))
+                .map(task -> taskConverter.convertToModel(task, new TaskDto()))
                 .collect(Collectors.toList());
 
         PageDto<TaskDto> pageDto = new PageDto<>();

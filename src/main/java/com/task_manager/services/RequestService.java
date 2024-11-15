@@ -43,7 +43,7 @@ public class RequestService {
             throw new NullPointerException("customer id must be specified");
         }
 
-        if (request.getDescription().length() < 40) {
+        if (request.getDescription().trim().length() < 40) {
             throw new RuntimeException("request description must be greater than 40 characters");
         }
 
@@ -79,7 +79,7 @@ public class RequestService {
             throw new NullPointerException("customer id must be specified");
         }
 
-        if (request.getDescription().length() < 40) {
+        if (request.getDescription().trim().length() < 40) {
             throw new RuntimeException("request description must be greater than 40 characters");
         }
 
