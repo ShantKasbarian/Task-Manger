@@ -145,8 +145,11 @@ public class RequestService {
             throw new RuntimeException("this request is already taken");
         }
 
+        if (!request.getRequestStatus().equals(RequestStatus.ACCEPTED)) {
+            throw new RuntimeException("request is not accepted yet");
+        }
+
         request.setTeam(team);
-        request.setRequestStatus(RequestStatus.ACCEPTED);
 
         return requestRepo.save(request);
     }

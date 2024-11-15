@@ -41,10 +41,10 @@ class RegisterServiceTest {
     void register() throws NoSuchAlgorithmException {
         when(userRepo.save(user)).thenReturn(user);
 
-        User savedUser = registerService.register(user);
+        User response = registerService.register(user);
 
-        assertEquals(user.getUserId(), savedUser.getUserId());
-        assertEquals(user.getUsername(), savedUser.getUsername());
+        assertEquals(user.getUserId(), response.getUserId());
+        assertEquals(user.getUsername(), response.getUsername());
     }
 
     @Test
