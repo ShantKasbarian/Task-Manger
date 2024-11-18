@@ -3,11 +3,12 @@ package com.task_manager.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.task_manager.configurations.JwtFilter;
 import com.task_manager.configurations.JwtService;
+import com.task_manager.converters.UserConverter;
 import com.task_manager.entities.Customer;
 import com.task_manager.entities.Role;
 import com.task_manager.entities.User;
 import com.task_manager.models.UserDto;
-import com.task_manager.services.ProfileService;
+import com.task_manager.services.RegisterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,24 +16,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@WebMvcTest(ProfileController.class)
+@WebMvcTest(RegisterController.class)
 @ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-class ProfileControllerTest {
+class RegisterControllerTest {
     @MockBean
-    private ProfileService profileService;
+    private RegisterService registerService;
+
+    @MockBean
+    private UserConverter userConverter;
 
     @MockBean
     private JwtService jwtService;
@@ -65,17 +64,13 @@ class ProfileControllerTest {
         userDto.setEmail("john@example.com");
         userDto.setPassword("Password123+");
         userDto.setRole(Role.CUSTOMER);
-
     }
 
     @Test
-    void getProfile() throws Exception {
-        mockMvc.perform(get("/profile")
-                .with(SecurityMockMvcRequestPostProcessors.jwt())
-                .with(SecurityMockMvcRequestPostProcessors.user(user.getUsername())
-                        .password(user.getPassword()).roles(user.getRole().toString()))
+    void register() throws Exception {
+        mockMvc.perform(post("/register")
                 .content(objectMapper.writeValueAsString(userDto))
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andExpect(MockMvcResultMatchers.status().isOk());
+        );
     }
 }
