@@ -40,7 +40,7 @@ public class RegisterService {
         return userRepo.save(user);
     }
 
-    private boolean isPasswordValid(String password) {
+    public boolean isPasswordValid(String password) {
         if (password.length() < 6) {
             throw new RuntimeException("password must be at least 6 characters long");
         }
@@ -55,35 +55,6 @@ public class RegisterService {
         Matcher lowercase = lowercasePattern.matcher(password);
         Matcher specialCharacter = specialCharacterPattern.matcher(password);
 
-        boolean hasNumber = number.find();
-        boolean hasUppercase = uppercase.find();
-        boolean hasLowercase = lowercase.find();
-        boolean hasSpecialCharacter = specialCharacter.find();
-
-        int numberCount = 0;
-        int uppercaseCount = 0;
-        int lowercaseCount = 0;
-        int specialCharacterCount = 0;
-
-        for (int i = 0; i < password.length(); i++) {
-            if (
-                    (numberCount + uppercaseCount + lowercaseCount + specialCharacterCount) == 4
-            ) {
-                return true;
-            }
-            if (hasNumber && numberCount == 0) {
-                numberCount++;
-            }
-            if (hasUppercase && uppercaseCount == 0) {
-                uppercaseCount++;
-            }
-            if (hasLowercase && lowercaseCount == 0) {
-                lowercaseCount++;
-            }
-            if (hasSpecialCharacter && specialCharacterCount == 0) {
-                specialCharacterCount++;
-            }
-        }
-        return false;
+        return number.find() && uppercase.find() && lowercase.find() && specialCharacter.find();
     }
 }
