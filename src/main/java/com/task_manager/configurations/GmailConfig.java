@@ -49,7 +49,7 @@ public class GmailConfig {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(
                 Objects.requireNonNull(
                         GmailConfig.class.getResourceAsStream(
-                        "/client_secret_136777425832-3gog0mmn24pkf36k14tobrhghl80r29f.apps.googleusercontent.com.json"))
+                                "/your secret"))
                 )
         );
 
