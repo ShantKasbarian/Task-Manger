@@ -101,14 +101,5 @@ public class GmailConfig {
         this.userEmail = userEmail;
     }
 
-    public static void main(String[] args) throws Exception {
-        new GmailConfig().sendMail("A new message", """
-                Dear reader,
-                                
-                Hello world.
-                                
-                Best regards,
-                myself
-                """);
-    }
+
 }
