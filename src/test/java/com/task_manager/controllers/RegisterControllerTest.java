@@ -19,13 +19,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @WebMvcTest(RegisterController.class)
 @ExtendWith(SpringExtension.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class RegisterControllerTest {
     @MockBean
     private RegisterService registerService;
@@ -69,8 +70,8 @@ class RegisterControllerTest {
     @Test
     void register() throws Exception {
         mockMvc.perform(post("/register")
-                .content(objectMapper.writeValueAsString(userDto))
                 .contentType(MediaType.APPLICATION_JSON)
-        );
+                .content(objectMapper.writeValueAsString(userDto))
+        ).andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
