@@ -49,7 +49,8 @@ public class GmailConfig {
         GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(
                 Objects.requireNonNull(
                         GmailConfig.class.getResourceAsStream(
-                                "/your secret"))
+                                "/your-secret"
+                        ))
                 )
         );
 
@@ -101,5 +102,15 @@ public class GmailConfig {
         this.userEmail = userEmail;
     }
 
-
+    // for testing purposes
+    public static void main(String[] args) throws Exception {
+        new GmailConfig().sendMail("A new message", """
+                Dear reader,
+                                
+                Hello world.
+                                
+                Best regards,
+                myself
+                """);
+    }
 }

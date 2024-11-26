@@ -33,9 +33,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers(
                                 "login",
-                                        "register",
-                                        "/password/forgot",
-                                        "/password/reset"
+                                "register",
+                                "/password/forgot",
+                                "/password/reset/{token}"
                         ).permitAll()
                         .anyRequest().authenticated()
                 ).httpBasic(Customizer.withDefaults())
