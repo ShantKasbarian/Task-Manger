@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class LoginService {
@@ -71,36 +72,30 @@ public class LoginService {
             throw new RuntimeException("user not found");
         }
 
+        String token = UUID.randomUUID().toString();
+
         gmailConfig.setUserEmail(email);
-        gmailConfig.sendMail("forgot password", "Hey, " +
-                "\n\nYour 4 digit code is: " + randomFourDigit + " and it expires in 5 minutes" +
+        gmailConfig.sendMail("password reset", "Hey, " +
+                "\n\nYour 4 digit code is: " + randomFourDigit + ". It expires in 5 minutes." +
+                "\nTo continue click on this link: http://localhost:8000/password/reset/" + token +
                 "\nIf you haven't requested a password change you can safely ignore this message." +
-                "\n\nBest regards, \nThe task manager team."
+                "\n\nBest Regards, \nThe Task Manager Team."
         );
 
         RandomFourDigits randomFourDigits = new RandomFourDigits();
         randomFourDigits.setNum(randomFourDigit);
         randomFourDigits.setSentTime(LocalDateTime.now());
         randomFourDigits.setSentTo(user);
+        randomFourDigits.setToken(token);
 
         randomFourDigitsRepo.save(randomFourDigits);
     }
 
-    public String resetPassword(String email, String password, Integer randomNum) {
-        User user = userRepo.findByEmail(email);
+    public String resetPassword(String token, String password, Integer randomNum) {
+        RandomFourDigits randomFourDigits = randomFourDigitsRepo.findByToken(token);
 
-        if (user == null) {
-            throw new NullPointerException("user not found");
-        }
-
-        RandomFourDigits randomFourDigits = randomFourDigitsRepo.findByNum(randomNum);
-
-        if (
-                randomFourDigits == null ||
-                !randomFourDigits.getSentTo().getEmail().equals(email)
-        ) {
-            throw new NullPointerException("code not found");
-        }
+        User user = userRepo.findById(randomFourDigits.getSentTo().getUserId())
+                .orElseThrow(() -> new NullPointerException("user not found"));
 
         if (
                 Duration.between(randomFourDigits.getSentTime(), LocalDateTime.now()).toMinutes() >= 5
@@ -111,6 +106,10 @@ public class LoginService {
 
         if (!registerService.isPasswordValid(password)) {
             throw new RuntimeException("invalid password");
+        }
+
+        if (!randomNum.equals(randomFourDigits.getNum())) {
+            throw new RuntimeException("number is incorrect");
         }
 
         randomFourDigitsRepo.delete(randomFourDigits);

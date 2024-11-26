@@ -20,5 +20,10 @@ public class RandomFourDigits {
 
     private LocalDateTime sentTime;
 
+    @ManyToOne
+    @JoinColumn(name = "sent_to_user_id")
     private User sentTo;
+
+    @Column(name = "token", unique = true)
+    private String token;
 }
