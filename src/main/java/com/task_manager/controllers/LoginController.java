@@ -21,14 +21,14 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserDto userDto) throws NoSuchAlgorithmException {
+    public ResponseEntity<String> login(@RequestBody UserDto userDto) throws NoSuchAlgorithmException {
         return ResponseEntity.ok(
                 loginService.login(userDto.getUsername(), userDto.getPassword())
         );
     }
 
     @PostMapping("/password/forgot")
-    public ResponseEntity<?> forgotPassword(@RequestBody EmailDto emailDto) throws Exception {
+    public ResponseEntity<String> forgotPassword(@RequestBody EmailDto emailDto) throws Exception {
         loginService.sendEmailVerification(emailDto.getEmail());
         return ResponseEntity.ok(
                 "email verification sent"
@@ -36,7 +36,7 @@ public class LoginController {
     }
 
     @PutMapping("/password/reset/{token}")
-    public ResponseEntity<?> resetPassword(
+    public ResponseEntity<String> resetPassword(
             @RequestBody ForgotPasswordDto forgotPasswordDto,
             @PathVariable String token
     ) throws Exception {

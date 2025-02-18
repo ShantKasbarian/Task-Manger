@@ -2,6 +2,7 @@ package com.task_manager.services;
 
 import com.task_manager.entities.User;
 import com.task_manager.repositories.UserRepo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ public class RegisterService {
 
     private final UserRepo userRepo;
 
+    @Autowired
     public RegisterService(UserRepo userRepo) {
         this.userRepo = userRepo;
     }

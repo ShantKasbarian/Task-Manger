@@ -75,7 +75,7 @@ public class LoginService {
         String token = UUID.randomUUID().toString();
 
         gmailConfig.setUserEmail(email);
-        gmailConfig.sendMail("password reset", "Hey, " +
+        gmailConfig.sendMail("Password Reset", "Hey, " +
                 "\n\nYour 4 digit code is: " + randomFourDigit + ". It expires in 5 minutes." +
                 "\nTo continue click on this link: http://localhost:8000/password/reset/" + token +
                 "\nIf you haven't requested a password change you can safely ignore this message." +
