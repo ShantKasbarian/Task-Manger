@@ -6,6 +6,7 @@ import com.task_manager.entities.*;
 import com.task_manager.models.UserDto;
 import com.task_manager.services.RegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,10 +31,10 @@ public class RegisterController {
     public ResponseEntity<User> register(@RequestBody UserDto userDto) throws NoSuchAlgorithmException {
         User user = new UserFactory().getUser(userDto.getRole());
 
-        return ResponseEntity.ok(
+        return new ResponseEntity<>(
                 registerService.register(
                         userConverter.convertToEntity(user, userDto)
-                )
+                ), HttpStatus.CREATED
         );
     }
 }
