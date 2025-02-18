@@ -18,10 +18,6 @@ import org.springframework.stereotype.Service;
 public class ProfileService {
     private final EmployeeRepo employeeRepo;
 
-    private final AdminRepo adminRepo;
-
-    private final CustomerRepo customerRepo;
-
     private final TeamLeadRepo teamLeadRepo;
 
     private final EmployeeConverter employeeConverter;
@@ -33,16 +29,12 @@ public class ProfileService {
     @Autowired
     public ProfileService(
             EmployeeRepo employeeRepo,
-            AdminRepo adminRepo,
-            CustomerRepo customerRepo,
             TeamLeadRepo teamLeadRepo,
             EmployeeConverter employeeConverter,
             UserConverter userConverter,
             TeamLeadConverter teamLeadConverter
     ) {
         this.employeeRepo = employeeRepo;
-        this.adminRepo = adminRepo;
-        this.customerRepo = customerRepo;
         this.teamLeadRepo = teamLeadRepo;
         this.employeeConverter = employeeConverter;
         this.userConverter = userConverter;
@@ -72,8 +64,10 @@ public class ProfileService {
                         )
                 );
             }
-        }
 
-        return (ResponseEntity<?>) ResponseEntity.badRequest();
+            default -> {
+                return (ResponseEntity<?>) ResponseEntity.badRequest();
+            }
+        }
     }
 }
