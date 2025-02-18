@@ -49,20 +49,25 @@ class RegisterServiceTest {
 
     @Test
     void registerShouldReturnEmailIsAlreadyInUse() {
-
+        when(userRepo.findByEmail(user.getEmail())).thenReturn(user);
+        assertThrows(RuntimeException.class, () -> registerService.register(user));
     }
 
     @Test
     void registerShouldReturnInvalidPassword() throws NoSuchAlgorithmException {
         user.setPassword("123");
+        assertThrows(RuntimeException.class, () -> registerService.register(user));
+    }
 
+    @Test
+    void registerShouldReturnUsernameAlreadyInUse() {
+        when(userRepo.findByUsername(user.getUsername())).thenReturn(user);
         assertThrows(RuntimeException.class, () -> registerService.register(user));
     }
 
     @Test
     void registerShouldReturnUsernameMustBeSpecified() {
         user.setUsername(null);
-
         assertThrows(RuntimeException.class, () -> registerService.register(user));
     }
 }
