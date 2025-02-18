@@ -1,5 +1,6 @@
 package com.task_manager.controllers;
 
+import com.task_manager.UserFactory;
 import com.task_manager.converters.UserConverter;
 import com.task_manager.entities.*;
 import com.task_manager.models.UserDto;
@@ -26,27 +27,8 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody UserDto userDto) throws NoSuchAlgorithmException {
-        User user = null;
-        switch (userDto.getRole()) {
-            case Role.CUSTOMER -> {
-                user = new Customer();
-                break;
-            }
-
-            case Role.ADMIN ->
-                throw new RuntimeException("access denied");
-
-            case Role.EMPLOYEE -> {
-                user = new Employee();
-                break;
-            }
-
-            case Role.TEAM_LEAD -> {
-                user = new TeamLead();
-                break;
-            }
-        }
+    public ResponseEntity<User> register(@RequestBody UserDto userDto) throws NoSuchAlgorithmException {
+        User user = new UserFactory().getUser(userDto.getRole());
 
         return ResponseEntity.ok(
                 registerService.register(

@@ -79,7 +79,7 @@ public class TeamController {
 
     @DeleteMapping("/{teamId}/delete")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteTeam(@PathVariable Long teamId) {
+    public ResponseEntity<String> deleteTeam(@PathVariable Long teamId) {
         return new ResponseEntity<>(
                 teamService.deleteTeam(teamId), HttpStatus.NO_CONTENT
         );
