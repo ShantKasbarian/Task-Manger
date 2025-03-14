@@ -5,6 +5,9 @@ import com.task_manager.entities.Employee;
 import com.task_manager.entities.Team;
 import com.task_manager.entities.TeamLead;
 import com.task_manager.entities.TeamStatus;
+import com.task_manager.exceptions.InvalidProvidedInfoException;
+import com.task_manager.exceptions.RequestUnauthorizedException;
+import com.task_manager.exceptions.ResourceNotFoundException;
 import com.task_manager.models.PageDto;
 import com.task_manager.models.TeamDto;
 import com.task_manager.repositories.EmployeeRepo;
@@ -43,11 +46,11 @@ public class TeamService {
 
     public Team createTeam(Team team, TeamLead teamLead) {
         if (team.getName() == null) {
-            throw new NullPointerException("team name must be specified");
+            throw new InvalidProvidedInfoException("team name must be specified");
         }
 
         if (teamLead.getTeam() != null) {
-            throw new RuntimeException("team lead can only create 1 team");
+            throw new RequestUnauthorizedException("team lead can only create 1 team");
         }
 
         team.setTeamStatus(TeamStatus.PENDING);
@@ -62,15 +65,15 @@ public class TeamService {
 
     public Team getTeamById(Long teamId) {
         return teamRepo.findById(teamId)
-                .orElseThrow(() -> new NullPointerException("team not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("team not found"));
     }
 
     public Team updateTeam(Team team) {
         Team oldTeam = teamRepo.findById(team.getTeamId())
-                .orElseThrow(() -> new NullPointerException("team doesn't exist"));
+                .orElseThrow(() -> new ResourceNotFoundException("team doesn't exist"));
 
         if (team.getName() == null) {
-            throw new NullPointerException("team name must be specified");
+            throw new InvalidProvidedInfoException("team name must be specified");
         }
 
         team.setTeamStatus(oldTeam.getTeamStatus());
@@ -80,7 +83,7 @@ public class TeamService {
 
     public String deleteTeam(Long teamId) {
         Team team = teamRepo.findById(teamId)
-                .orElseThrow(() -> new NullPointerException("team not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("team not found"));
 
         teamRepo.delete(team);
 
@@ -106,7 +109,7 @@ public class TeamService {
 
     public Team AcceptTeam(Long teamId) {
         Team team = teamRepo.findById(teamId)
-                .orElseThrow(() -> new NullPointerException("team not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("team not found"));
 
         team.setTeamStatus(TeamStatus.ACCEPTED);
 
@@ -115,7 +118,7 @@ public class TeamService {
 
     public Team rejectTeam(Long teamId) {
         Team team = teamRepo.findById(teamId)
-                .orElseThrow(() -> new NullPointerException("team not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("team not found"));
 
         team.setTeamStatus(TeamStatus.REJECTED);
 
@@ -124,18 +127,18 @@ public class TeamService {
 
     public Employee assignEmployeeToTeam(Long employeeId, Team team) {
         Employee employee = employeeRepo.findById(employeeId)
-                .orElseThrow(() -> new NullPointerException("employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("employee not found"));
 
         if (team == null) {
-            throw new RuntimeException("cannot assign employee to team because team is null");
+            throw new ResourceNotFoundException("team not found");
         }
 
         if (!team.getTeamStatus().equals(TeamStatus.ACCEPTED)) {
-            throw new RuntimeException("team has not been accepted yet");
+            throw new RequestUnauthorizedException("team has not been accepted yet");
         }
 
         if (employee.getTeam() != null) {
-            throw new RuntimeException("employee is already assigned to another team");
+            throw new RequestUnauthorizedException("employee is already assigned to another team");
         }
 
         employee.setTeam(team);
@@ -145,10 +148,10 @@ public class TeamService {
 
     public Employee removeEmployeeFromTeam(Long employeeId, Long teamId) {
         Employee employee = employeeRepo.findById(employeeId)
-                .orElseThrow(() -> new NullPointerException("employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("employee not found"));
 
         if (!employee.getTeam().getTeamId().equals(teamId)) {
-            throw new RuntimeException("employee is not from your team");
+            throw new RequestUnauthorizedException("employee is not from your team");
         }
 
         employee.setTeam(null);

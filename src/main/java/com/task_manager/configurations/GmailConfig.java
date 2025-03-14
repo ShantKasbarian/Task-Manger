@@ -32,7 +32,7 @@ import static javax.mail.Message.RecipientType.TO;
 
 @Component
 public class GmailConfig {
-    private String userEmail = "";
+    private String userEmail = "raffi.kasbarian1@gmail.com";
 
     private final Gmail service;
 
