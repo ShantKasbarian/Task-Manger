@@ -5,6 +5,10 @@ import com.task_manager.entities.Customer;
 import com.task_manager.entities.Request;
 import com.task_manager.entities.RequestStatus;
 import com.task_manager.entities.Team;
+import com.task_manager.exceptions.InvalidProvidedInfoException;
+import com.task_manager.exceptions.RequestAlreadyTakenException;
+import com.task_manager.exceptions.RequestUnauthorizedException;
+import com.task_manager.exceptions.ResourceNotFoundException;
 import com.task_manager.models.PageDto;
 import com.task_manager.models.RequestDto;
 import com.task_manager.repositories.RequestRepo;
@@ -40,15 +44,15 @@ public class RequestService {
         request.setRequestStatus(RequestStatus.PENDING);
 
         if (request.getCustomer() == null) {
-            throw new NullPointerException("customer id must be specified");
+            throw new InvalidProvidedInfoException("customer id must be specified");
         }
 
-        if (request.getDescription().trim().length() < 40) {
-            throw new RuntimeException("request description must be greater than 40 characters");
+        if (request.getDescription() == null || request.getDescription().trim().length() < 10) {
+            throw new InvalidProvidedInfoException("request description must be greater than 10 characters");
         }
 
-        if (request.getTitle() == null) {
-            throw new NullPointerException("title must be specified");
+        if (request.getTitle() == null || request.getTitle().trim().isEmpty()) {
+            throw new InvalidProvidedInfoException("title must be specified");
         }
 
         return requestRepo.save(request);
@@ -56,10 +60,10 @@ public class RequestService {
 
     public Request getRequestById(Long reqId, Long customerId) {
         Request request = requestRepo.findById(reqId)
-                .orElseThrow(() -> new NullPointerException("request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("request not found"));
 
         if (!request.getCustomer().getUserId().equals(customerId)) {
-            throw new RuntimeException("access denied");
+            throw new RequestUnauthorizedException("access denied");
         }
 
         return request;
@@ -67,24 +71,20 @@ public class RequestService {
 
     public Request updateRequest(Request request) {
         Request oldReq = requestRepo.findById(request.getRequestId())
-                .orElseThrow(() -> new NullPointerException("request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("request not found"));
 
-        RequestStatus expectedStatus = oldReq.getRequestStatus();
-
-        if (!request.getRequestStatus().equals(expectedStatus)) {
-            throw new NullPointerException("customer doesn't have the authorization to change request status");
-        }
+        request.setRequestStatus(oldReq.getRequestStatus());
 
         if (request.getCustomer() == null) {
-            throw new NullPointerException("customer id must be specified");
+            throw new InvalidProvidedInfoException("customer id must be specified");
         }
 
-        if (request.getDescription().trim().length() < 40) {
-            throw new RuntimeException("request description must be greater than 40 characters");
+        if (request.getDescription().trim().length() < 10) {
+            throw new InvalidProvidedInfoException("request description must be greater than 10 characters");
         }
 
         if (request.getTitle() == null) {
-            throw new NullPointerException("title must be specified");
+            throw new InvalidProvidedInfoException("title must be specified");
         }
 
         return requestRepo.save(request);
@@ -109,10 +109,10 @@ public class RequestService {
 
     public String deleteRequest(Long reqId, Long customerId) {
         Request request = requestRepo.findById(reqId)
-                .orElseThrow(() -> new NullPointerException("request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("request not found"));
 
         if (!request.getCustomer().getUserId().equals(customerId)) {
-            throw new RuntimeException("unauthorized");
+            throw new RequestUnauthorizedException("unauthorized");
         }
 
         requestRepo.delete(request);
@@ -139,14 +139,14 @@ public class RequestService {
 
     public Request takeRequest(Long reqId, Team team) {
         Request request = requestRepo.findById(reqId)
-                .orElseThrow(() -> new NullPointerException("request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("request not found"));
 
         if (request.getTeam() != null) {
-            throw new RuntimeException("this request is already taken");
+            throw new RequestAlreadyTakenException("this request is already taken");
         }
 
         if (!request.getRequestStatus().equals(RequestStatus.ACCEPTED)) {
-            throw new RuntimeException("request is not accepted yet");
+            throw new ResourceNotFoundException("request is not accepted yet");
         }
 
         request.setTeam(team);
@@ -156,14 +156,14 @@ public class RequestService {
 
     public Request changeRequestStatus(RequestStatus requestStatus, Long reqId, Long teamId) {
         Request request = requestRepo.findById(reqId)
-                .orElseThrow(() -> new NullPointerException("request not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("request not found"));
 
         if (!request.getTeam().getTeamId().equals(teamId)) {
-            throw new RuntimeException("request has been taken by another team or has not been taken");
+            throw new RequestAlreadyTakenException("request has been taken by another team or has not been taken");
         }
 
         if (requestStatus.equals(RequestStatus.REJECTED)) {
-            throw new RuntimeException("only admin can reject requests");
+            throw new RequestUnauthorizedException("only admin can reject requests");
         }
 
         request.setRequestStatus(requestStatus);

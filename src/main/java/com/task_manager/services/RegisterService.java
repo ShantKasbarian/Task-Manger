@@ -1,6 +1,7 @@
 package com.task_manager.services;
 
 import com.task_manager.entities.User;
+import com.task_manager.exceptions.InvalidProvidedInfoException;
 import com.task_manager.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -22,19 +23,19 @@ public class RegisterService {
 
     public User register(User user) throws NoSuchAlgorithmException {
         if (userRepo.findByEmail(user.getEmail()) != null) {
-            throw new RuntimeException("email is already in use");
+            throw new InvalidProvidedInfoException("email is already in use");
         }
 
         if (userRepo.findByUsername(user.getUsername()) != null) {
-            throw new RuntimeException("name is already in use");
+            throw new InvalidProvidedInfoException("name is already in use");
         }
 
         if (!isPasswordValid(user.getPassword())) {
-            throw new RuntimeException("password is invalid");
+            throw new InvalidProvidedInfoException("password is invalid");
         }
 
         if (user.getUsername() == null) {
-            throw new RuntimeException("username must be specified");
+            throw new InvalidProvidedInfoException("username must be specified");
         }
         String pw_hash = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt(12));
         user.setPassword(pw_hash);
@@ -44,7 +45,7 @@ public class RegisterService {
 
     public boolean isPasswordValid(String password) {
         if (password.length() < 6) {
-            throw new RuntimeException("password must be at least 6 characters long");
+            throw new InvalidProvidedInfoException("password must be at least 6 characters long");
         }
 
         Pattern numberPattern = Pattern.compile("[0-9]");

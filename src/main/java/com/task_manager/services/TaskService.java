@@ -4,6 +4,9 @@ import com.task_manager.converters.TaskConverter;
 import com.task_manager.entities.Employee;
 import com.task_manager.entities.Task;
 import com.task_manager.entities.TaskStatus;
+import com.task_manager.exceptions.InvalidProvidedInfoException;
+import com.task_manager.exceptions.RequestUnauthorizedException;
+import com.task_manager.exceptions.ResourceNotFoundException;
 import com.task_manager.models.PageDto;
 import com.task_manager.models.TaskDto;
 import com.task_manager.repositories.EmployeeRepo;
@@ -45,20 +48,20 @@ public class TaskService {
 
         if (
                 task.getDescription() == null ||
-                task.getDescription().trim().length() < 20
+                task.getDescription().trim().length() < 10
         ) {
-            throw new RuntimeException("task description must be greater than 20 characters");
+            throw new InvalidProvidedInfoException("task description must be greater than 10 characters");
         }
 
         if (task.getTitle() == null) {
-            throw new NullPointerException("title must be specified");
+            throw new InvalidProvidedInfoException("title must be specified");
         }
 
         Employee employee = employeeRepo.findById(employeeId)
-                .orElseThrow(() -> new NullPointerException("employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("employee not found"));
 
         if (!employee.getTeam().getTeamId().equals(teamId)) {
-            throw new RuntimeException("cannot assign a task to an employee from another team");
+            throw new RequestUnauthorizedException("cannot assign a task to an employee from another team");
         }
 
         task.setTaskStatus(TaskStatus.PENDING);
@@ -70,15 +73,15 @@ public class TaskService {
 
     public Task getTaskById(Long taskId) {
         return taskRepo.findById(taskId)
-                .orElseThrow(() -> new NullPointerException("task not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("task not found"));
     }
 
     public Task markAsDone(Long taskId, Long employeeId) {
         Task task = taskRepo.findById(taskId)
-                .orElseThrow(() -> new NullPointerException("task not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("task not found"));
 
         if (!task.getEmployee().getUserId().equals(employeeId)) {
-            throw new RuntimeException("cannot mark another employee's task as done");
+            throw new RequestUnauthorizedException("cannot mark another employee's task as done");
         }
 
         task.setTaskStatus(TaskStatus.DONE);
@@ -94,17 +97,17 @@ public class TaskService {
 
         if (
                 task.getDescription() == null ||
-                        task.getDescription().trim().length() < 20
+                task.getDescription().trim().length() < 10
         ) {
-            throw new RuntimeException("task description must be greater than 20 characters");
+            throw new InvalidProvidedInfoException("task description must be greater than 10 characters");
         }
 
         if (task.getTitle() == null) {
-            throw new NullPointerException("title must be specified");
+            throw new InvalidProvidedInfoException("title must be specified");
         }
 
         if (!task.getEmployee().getTeam().getTeamId().equals(teamId)) {
-            throw new RuntimeException("cannot update an employee's task from another team");
+            throw new RequestUnauthorizedException("cannot update an employee's task from another team");
         }
 
         return taskRepo.save(task);
@@ -115,7 +118,7 @@ public class TaskService {
                 .orElseThrow(() -> new NullPointerException("task not found"));
 
         if (!task.getEmployee().getTeam().getTeamId().equals(teamId)) {
-            throw new RuntimeException("cannot delete a task from another team");
+            throw new RequestUnauthorizedException("cannot delete a task from another team");
         }
 
         taskRepo.delete(task);

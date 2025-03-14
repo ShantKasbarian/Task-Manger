@@ -4,6 +4,10 @@ import com.task_manager.configurations.GmailConfig;
 import com.task_manager.configurations.JwtService;
 import com.task_manager.entities.RandomFourDigits;
 import com.task_manager.entities.User;
+import com.task_manager.exceptions.CodeHasExpiredException;
+import com.task_manager.exceptions.InvalidCredentialsException;
+import com.task_manager.exceptions.InvalidProvidedInfoException;
+import com.task_manager.exceptions.ResourceNotFoundException;
 import com.task_manager.repositories.RandomFourDigitsRepo;
 import com.task_manager.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +64,7 @@ public class LoginService {
             return jwtService.generateToken(username);
         }
 
-        throw new RuntimeException("bad credentials");
+        throw new InvalidCredentialsException("bad credentials");
     }
 
     public void sendEmailVerification(String email) throws Exception {
@@ -69,7 +73,7 @@ public class LoginService {
         User user = userRepo.findByEmail(email);
 
         if (user == null) {
-            throw new RuntimeException("user not found");
+            throw new ResourceNotFoundException("user not found");
         }
 
         String token = UUID.randomUUID().toString();
@@ -101,15 +105,15 @@ public class LoginService {
                 Duration.between(randomFourDigits.getSentTime(), LocalDateTime.now()).toMinutes() >= 5
         ) {
             randomFourDigitsRepo.delete(randomFourDigits);
-            throw new RuntimeException("this code has expired");
+            throw new CodeHasExpiredException("this code has expired");
         }
 
         if (!registerService.isPasswordValid(password)) {
-            throw new RuntimeException("invalid password");
+            throw new InvalidProvidedInfoException("invalid password");
         }
 
         if (!randomNum.equals(randomFourDigits.getNum())) {
-            throw new RuntimeException("number is incorrect");
+            throw new InvalidProvidedInfoException("number is incorrect");
         }
 
         randomFourDigitsRepo.delete(randomFourDigits);
